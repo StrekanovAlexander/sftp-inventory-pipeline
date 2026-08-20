@@ -1,0 +1,14 @@
+{
+  "name": "sftp-inventory-feed",
+  "version": "1.0.0",
+  "description": "SFTP inventory feed pipeline for data retrieval, transformation, and delivery.",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "ssh2-sftp-client": "^11.0.0"
+  }
+}
