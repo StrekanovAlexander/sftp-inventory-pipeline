@@ -20,6 +20,11 @@ export function renderStatusPage(status) {
                     Source file:
                     <strong>${status.sourceFile}</strong>
                 </p>
+
+                <p>
+                    Feed transformation:
+                    <strong>${status.transform}</strong>
+                </p>
             </body>
         </html>
     `;

@@ -5,13 +5,15 @@ import path from 'path';
 import { sourceConfig } from './config/sftp.js';
 import { checkSftpConnection } from './sftp/connection.js';
 import { downloadFile } from './sftp/download.js';
+import { transformFeed } from './transform/feed.js';
 import { renderStatusPage } from './web/render.js';
 
 const port = process.env.PORT || 3000;
 
 const status = { 
     source: 'Not checked', 
-    sourceFile: 'Not started'
+    sourceFile: 'Not started',
+    transform: 'Not started'
 };
 
 const server = http.createServer((req, res) => { 
@@ -54,6 +56,21 @@ async function runPipelineCheck() {
 
     status.sourceFile = 'OK';
     console.log('Source file download: OK');
+
+    status.transform = 'Processing...';
+
+    const transformed = await transformFeed(
+        path.join(process.cwd(), 'data', 'vehicle_inventory_feed.csv'),
+        path.join(process.cwd(), 'public', 'vehicle_inventory_feed.tsv')
+    );
+
+    if (!transformed) {
+        status.transform = 'FAILED';
+        throw new Error('Feed transformation failed.');
+    }
+
+    status.transform = 'OK';
+    console.log('Feed transformation: OK');
 }
 
 server.listen(port, '0.0.0.0', () => { 
