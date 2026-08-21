@@ -1,22 +1,20 @@
 import SftpClient from 'ssh2-sftp-client';
 
-export async function checkSftpConnection(config) {
+export async function downloadFile(config, remoteFile, localFile) {
     const sftp = new SftpClient();
 
     try {
         await sftp.connect(config);
+        await sftp.fastGet(remoteFile, localFile);
         await sftp.end();
 
         return true;
     } catch (error) {
-        console.error('SFTP connection error'); 
-        console.error('Message:', error.message); 
-        console.error('Code:', error.code); 
-        console.error('Stack:', error.stack);
-
         try {
             await sftp.end();
         } catch {}
+
+        console.error('SFTP download error:', error.message);
 
         return false;
     }

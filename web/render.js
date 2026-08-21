@@ -8,14 +8,17 @@ export function renderStatusPage(status) {
             </head>
             <body>
                 <h1>SFTP Inventory Feed</h1>
+                
                 <h2>Pipeline status</h2>
+                
                 <p>
                     Source SFTP:
                     <strong>${status.source}</strong>
                 </p>
+
                 <p>
-                    Destination SFTP:
-                    <strong>${status.destination}</strong>
+                    Source file:
+                    <strong>${status.sourceFile}</strong>
                 </p>
             </body>
         </html>

@@ -1,15 +1,17 @@
 import 'dotenv/config';
 import http from 'http';
+import path from 'path';
 
-import { sourceConfig, destinationConfig } from './config/sftp.js';
+import { sourceConfig } from './config/sftp.js';
 import { checkSftpConnection } from './sftp/connection.js';
+import { downloadFile } from './sftp/download.js';
 import { renderStatusPage } from './web/render.js';
 
 const port = process.env.PORT || 3000;
 
 const status = { 
     source: 'Not checked', 
-    destination: 'Not checked' 
+    sourceFile: 'Not started'
 };
 
 const server = http.createServer((req, res) => { 
@@ -32,20 +34,26 @@ async function runPipelineCheck() {
     if (!sourceConnected) { 
         status.source = 'FAILED'; 
         throw new Error('Source SFTP connection failed.'); 
-    } status.source = 'OK'; 
-    
-    console.log('Source SFTP connection: OK'); 
-    status.destination = 'Checking...'; 
-    
-    const destinationConnected = await checkSftpConnection(destinationConfig); 
-    
-    if (!destinationConnected) { 
-        status.destination = 'FAILED'; 
-        throw new Error('Destination SFTP connection failed.'); 
     } 
     
-    status.destination = 'OK'; 
-    console.log('Destination SFTP connection: OK'); 
+    status.source = 'OK'; 
+    console.log('Source SFTP connection: OK'); 
+
+    status.sourceFile = 'Downloading...';
+
+    const sourceFile = await downloadFile(
+        sourceConfig,
+        './vehicle_inventory_feed.csv',
+        path.join(process.cwd(), 'data', 'vehicle_inventory_feed.csv')
+    );
+
+    if (!sourceFile) {
+        status.sourceFile = 'FAILED';
+        throw new Error('Source file download failed.');
+    }
+
+    status.sourceFile = 'OK';
+    console.log('Source file download: OK');
 }
 
 server.listen(port, '0.0.0.0', () => { 
